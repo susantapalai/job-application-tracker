@@ -34,10 +34,11 @@ class JobApplicationApiTest {
         given()
                 .port(port)
         .when()
-                .get("/api/applications/1200")
+                .get("/api/applications/2")
         .then()
                 .statusCode(200)
-                .body("id", equalTo(1200));
+                .body("id", equalTo(2))
+                .body("companyName", equalTo("TCS"));
 
     }
 
@@ -53,5 +54,15 @@ class JobApplicationApiTest {
 
     }
 
+    @Test
+    void shouldReturn404WhenApplicationDoesNotExist() {
+
+        given()
+                .port(port)
+                .when()
+                .get("/api/applications/999")
+                .then()
+                .statusCode(404);
+    }
 
 }
