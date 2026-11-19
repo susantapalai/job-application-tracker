@@ -28,5 +28,30 @@ class JobApplicationApiTest {
                 .body("status", equalTo("APPLIED"));
 
     }
+    @Test
+    void shouldReturnApplicationWithDynamicId() {
+
+        given()
+                .port(port)
+        .when()
+                .get("/api/applications/1200")
+        .then()
+                .statusCode(200)
+                .body("id", equalTo(1200));
+
+    }
+
+    @Test
+    void shouldRejectInvalidApplicationId() {
+
+        given()
+                .port(port)
+        .when()
+                .get("/api/applications/abc")
+        .then()
+                .statusCode(400);
+
+    }
+
 
 }
