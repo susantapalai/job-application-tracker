@@ -4,6 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import com.jobtracker.model.JobApplication;
+import com.jobtracker.repository.JobApplicationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -13,34 +17,8 @@ class JobApplicationApiTest {
     @LocalServerPort
     private int port;
 
-    @Test
-    void shouldReturnJobApplication() {
-
-        given()
-                .port(port)
-                .when()
-                .get("/api/applications/1")
-                .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("companyName", equalTo("Infosys"))
-                .body("jobRole", equalTo("Java Developer"))
-                .body("status", equalTo("APPLIED"));
-
-    }
-    @Test
-    void shouldReturnApplicationWithDynamicId() {
-
-        given()
-                .port(port)
-        .when()
-                .get("/api/applications/2")
-        .then()
-                .statusCode(200)
-                .body("id", equalTo(2))
-                .body("companyName", equalTo("TCS"));
-
-    }
+    @Autowired
+    private JobApplicationRepository repository;
 
     @Test
     void shouldRejectInvalidApplicationId() {
@@ -57,12 +35,52 @@ class JobApplicationApiTest {
     @Test
     void shouldReturn404WhenApplicationDoesNotExist() {
 
+        JobApplication job = new JobApplication(
+                "Missing Company",
+                "Java Developer",
+                "APPLIED"
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        Long deletedId = savedJob.getId();
+
+        repository.deleteById(deletedId);
+
         given()
                 .port(port)
                 .when()
-                .get("/api/applications/999")
+                .get("/api/applications/" + deletedId)
                 .then()
                 .statusCode(404);
     }
+
+    @Test
+    void shouldReturnSavedJobApplication() {
+
+        JobApplication job = new JobApplication(
+                "Accenture",
+                "Backend Developer",
+                "APPLIED"
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        try {
+            given()
+                    .port(port)
+                    .when()
+                    .get("/api/applications/" + savedJob.getId())
+                    .then()
+                    .statusCode(200)
+                    .body("companyName", equalTo("Accenture"))
+                    .body("jobRole", equalTo("Backend Developer"))
+                    .body("status", equalTo("APPLIED"));
+
+        } finally {
+            repository.deleteById(savedJob.getId());
+        }
+    }
+
 
 }
