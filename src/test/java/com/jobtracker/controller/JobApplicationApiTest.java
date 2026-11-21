@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
+import io.restassured.response.Response;
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class JobApplicationApiTest {
 
@@ -82,5 +85,36 @@ class JobApplicationApiTest {
         }
     }
 
+    @Test
+    void shouldCreateJobApplication() {
+        String requestBody = """
+                {
+                    "companyName": "TCS",
+                    "jobRole": "Backend Developer",
+                    "status": "APPLIED"
+                }
+                """;
 
+        Response response = given()
+                .port(port)
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/api/applications");
+
+        try {
+            response.then()
+                    .statusCode(201)
+                    .body("companyName", equalTo("TCS"))
+                    .body("jobRole", equalTo("Backend Developer"))
+                    .body("status", equalTo("APPLIED"));
+
+        } finally {
+            Long createdId = response.jsonPath().getLong("id");
+
+            if (createdId != null) {
+                repository.deleteById(createdId);
+            }
+        }
+    }
 }

@@ -2,9 +2,7 @@ package com.jobtracker.controller;
 import com.jobtracker.model.JobApplication;
 import com.jobtracker.service.JobApplicationService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -30,5 +28,11 @@ public class JobApplicationController {
                 HttpStatus.NOT_FOUND,
                 "Application not found"
         );
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/api/applications")
+    public JobApplication createApplication(@RequestBody JobApplication job) {
+        return jobApplicationService.saveApplication(job);
     }
 }

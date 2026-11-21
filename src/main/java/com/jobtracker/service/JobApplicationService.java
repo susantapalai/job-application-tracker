@@ -16,4 +16,8 @@ public class JobApplicationService {
         return repository.findById(id).orElse(null);
     }
 
+    public JobApplication saveApplication(JobApplication job){
+        return repository.save(job);
+    }
+
 }
