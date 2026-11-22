@@ -4,7 +4,7 @@ import com.jobtracker.service.JobApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
+import jakarta.validation.Valid;
 
 @RestController
 public class JobApplicationController {
@@ -32,7 +32,7 @@ public class JobApplicationController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/api/applications")
-    public JobApplication createApplication(@RequestBody JobApplication job) {
+    public JobApplication createApplication(@Valid @RequestBody JobApplication job) {
         return jobApplicationService.saveApplication(job);
     }
 }

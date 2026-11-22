@@ -117,4 +117,24 @@ class JobApplicationApiTest {
             }
         }
     }
+    @Test
+    void shouldRejectBlankCompanyName() {
+
+        String requestBody = """
+            {
+                "companyName": "",
+                "jobRole": "Java Developer",
+                "status": "APPLIED"
+            }
+            """;
+
+        given()
+                .port(port)
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/api/applications")
+                .then()
+                .statusCode(400);
+    }
 }
