@@ -137,4 +137,24 @@ class JobApplicationApiTest {
                 .then()
                 .statusCode(400);
     }
+    @Test
+    void shouldRejectBlankJobRole() {
+
+        String requestBody = """
+            {
+                "companyName": "Infosys",
+                "jobRole": "",
+                "status": "APPLIED"
+            }
+            """;
+
+        given()
+                .port(port)
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/api/applications")
+                .then()
+                .statusCode(400);
+    }
 }

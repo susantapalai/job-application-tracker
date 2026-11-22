@@ -14,6 +14,7 @@ public class JobApplication {
     private Long id;
     @NotBlank(message =  "Company name is required")
     private String companyName;
+    @NotBlank(message =  "Job role is required")
     private String jobRole;
     private String status;
 
