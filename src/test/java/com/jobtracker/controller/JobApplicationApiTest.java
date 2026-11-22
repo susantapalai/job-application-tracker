@@ -1,5 +1,6 @@
 package com.jobtracker.controller;
 
+import com.jobtracker.model.ApplicationStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -41,7 +42,7 @@ class JobApplicationApiTest {
         JobApplication job = new JobApplication(
                 "Missing Company",
                 "Java Developer",
-                "APPLIED"
+                ApplicationStatus.APPLIED
         );
 
         JobApplication savedJob = repository.save(job);
@@ -64,7 +65,7 @@ class JobApplicationApiTest {
         JobApplication job = new JobApplication(
                 "Accenture",
                 "Backend Developer",
-                "APPLIED"
+                ApplicationStatus.APPLIED
         );
 
         JobApplication savedJob = repository.save(job);

@@ -6,6 +6,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
+
 @Entity
 public class JobApplication {
 
@@ -16,14 +20,15 @@ public class JobApplication {
     private String companyName;
     @NotBlank(message =  "Job role is required")
     private String jobRole;
-    @NotBlank(message = "Application status is required")
-    private String status;
+    @NotNull(message = "Application status is required")
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
 
     protected JobApplication() {
     }
 
     public JobApplication(Long id, String companyName,
-                          String jobRole, String status) {
+                          String jobRole, ApplicationStatus status) {
         this.id = id;
         this.companyName = companyName;
         this.jobRole = jobRole;
@@ -31,7 +36,7 @@ public class JobApplication {
     }
     public JobApplication(String companyName,
                           String jobRole,
-                          String status) {
+                          ApplicationStatus status) {
         this.companyName = companyName;
         this.jobRole = jobRole;
         this.status = status;
@@ -53,11 +58,11 @@ public class JobApplication {
         this.jobRole = jobRole;
     }
 
-    public String getStatus() {
+    public ApplicationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ApplicationStatus status) {
         this.status = status;
     }
 

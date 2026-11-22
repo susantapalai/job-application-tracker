@@ -1,5 +1,6 @@
 package com.jobtracker;
 
+import com.jobtracker.model.ApplicationStatus;
 import com.jobtracker.model.JobApplication;
 
 public class    JobApplicationDemo {
@@ -10,7 +11,7 @@ public class    JobApplicationDemo {
                 1L,
                 "Infosys",
                 "Java Developer",
-                "APPLIED"
+                ApplicationStatus.APPLIED
         );
 
         System.out.println(job.getCompanyName());
