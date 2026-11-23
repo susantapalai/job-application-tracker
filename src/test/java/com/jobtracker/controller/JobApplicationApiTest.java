@@ -375,4 +375,53 @@ class JobApplicationApiTest {
             repository.deleteById(savedJob.getId());
         }
     }
+    @Test
+    void shouldDeleteExistingJobApplication() {
+
+        JobApplication job = new JobApplication(
+                "Delete Test Company",
+                "Java Developer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        Long applicationId = savedJob.getId();
+
+        given()
+                .port(port)
+                .when()
+                .delete("/api/applications/" + applicationId)
+                .then()
+                .statusCode(204);
+
+        given()
+                .port(port)
+                .when()
+                .get("/api/applications/" + applicationId)
+                .then()
+                .statusCode(404);
+    }
+    @Test
+    void shouldReturn404WhenDeletingMissingApplication() {
+
+        JobApplication job = new JobApplication(
+                "Missing Company",
+                "Java Developer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        Long deletedId = savedJob.getId();
+
+        repository.deleteById(deletedId);
+
+        given()
+                .port(port)
+                .when()
+                .delete("/api/applications/" + deletedId)
+                .then()
+                .statusCode(404);
+    }
 }
