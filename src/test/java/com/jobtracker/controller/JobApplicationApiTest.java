@@ -263,4 +263,116 @@ class JobApplicationApiTest {
             }
         }
     }
+    @Test
+    void shouldUpdateExistingJobApplication() {
+
+        JobApplication job = new JobApplication(
+                "Amazon",
+                "Software Engineer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        try {
+            String requestBody = """
+                {
+                    "companyName": "Amazon",
+                    "jobRole": "Java Backend Developer",
+                    "status": "INTERVIEW"
+                }
+                """;
+
+            given()
+                    .port(port)
+                    .contentType(ContentType.JSON)
+                    .body(requestBody)
+                    .when()
+                    .put("/api/applications/" + savedJob.getId())
+                    .then()
+                    .statusCode(200)
+                    .body("id", equalTo(savedJob.getId().intValue()))
+                    .body("companyName", equalTo("Amazon"))
+                    .body("jobRole", equalTo("Java Backend Developer"))
+                    .body("status", equalTo("INTERVIEW"));
+
+        } finally {
+            repository.deleteById(savedJob.getId());
+        }
+    }
+    @Test
+    void shouldReturn404WhenUpdatingMissingApplication() {
+
+        JobApplication job = new JobApplication(
+                "Missing Company",
+                "Java Developer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        Long deletedId = savedJob.getId();
+
+        repository.deleteById(deletedId);
+
+        String requestBody = """
+            {
+                "companyName": "Amazon",
+                "jobRole": "Java Backend Developer",
+                "status": "INTERVIEW"
+            }
+            """;
+
+        given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+                .when()
+                .put("/api/applications/" + deletedId)
+                .then()
+                .statusCode(404);
+    }
+    @Test
+    void shouldRejectBlankCompanyNameWhenUpdating() {
+
+        JobApplication job = new JobApplication(
+                "Amazon",
+                "Software Engineer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        try {
+            String requestBody = """
+                {
+                    "companyName": "",
+                    "jobRole": "Java Backend Developer",
+                    "status": "INTERVIEW"
+                }
+                """;
+
+            given()
+                    .port(port)
+                    .contentType(ContentType.JSON)
+                    .body(requestBody)
+                    .when()
+                    .put("/api/applications/" + savedJob.getId())
+                    .then()
+                    .statusCode(400);
+
+            given()
+                    .port(port)
+                    .when()
+                    .get("/api/applications/" + savedJob.getId())
+                    .then()
+                    .statusCode(200)
+                    .body("companyName", equalTo("Amazon"))
+                    .body("jobRole", equalTo("Software Engineer"))
+                    .body("status", equalTo("APPLIED"));
+
+        } finally {
+            repository.deleteById(savedJob.getId());
+        }
+    }
 }

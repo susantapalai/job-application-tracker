@@ -40,4 +40,21 @@ public class JobApplicationController {
     public List<JobApplication> getAllApplications() {
         return jobApplicationService.getAllApplications();
     }
+    @PutMapping("/api/applications/{id}")
+    public JobApplication updateApplication(
+            @PathVariable Long id,
+            @Valid @RequestBody JobApplication updatedJob) {
+
+        JobApplication result =
+                jobApplicationService.updateApplication(id, updatedJob);
+
+        if (result == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Application not found"
+            );
+        }
+
+        return result;
+    }
 }
