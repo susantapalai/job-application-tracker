@@ -1,6 +1,7 @@
 package com.jobtracker.controller;
 
 import com.jobtracker.model.ApplicationStatus;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -177,5 +178,89 @@ class JobApplicationApiTest {
                 .post("/api/applications")
                 .then()
                 .statusCode(400);
+    }
+    @Test
+    void shouldRejectInvalidApplicationStatus() {
+
+        given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body("""
+            {
+              "companyName": "Infosys",
+              "jobRole": "Java Developer",
+              "status": "PIZZA"
+            }
+            """)
+                .when()
+                .post("/api/applications")
+                .then()
+                .log().all()
+                .statusCode(400);
+    }
+    @Test
+    void shouldReturnAllJobApplications() {
+
+        JobApplication job = new JobApplication(
+                "Infosys",
+                "Java Developer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication savedJob = repository.save(job);
+
+        try {
+            given()
+                    .port(port)
+                    .when()
+                    .get("/api/applications")
+                    .then()
+                    .statusCode(200)
+                    .body("find { it.id == " + savedJob.getId() + " }.companyName",
+                            equalTo("Infosys"));
+
+        } finally {
+            repository.deleteById(savedJob.getId());
+        }
+    }
+    @Test
+    void shouldReturnMultipleJobApplications() {
+
+        JobApplication firstJob = new JobApplication(
+                "Infosys",
+                "Java Developer",
+                ApplicationStatus.APPLIED
+        );
+
+        JobApplication secondJob = new JobApplication(
+                "TCS",
+                "Backend Developer",
+                ApplicationStatus.INTERVIEW
+        );
+
+        JobApplication savedFirst = repository.save(firstJob);
+        JobApplication savedSecond = null;
+
+        try {
+            savedSecond = repository.save(secondJob);
+
+            given()
+                    .port(port)
+                    .when()
+                    .get("/api/applications")
+                    .then()
+                    .statusCode(200)
+                    .body("find { it.companyName == 'Infosys' }.jobRole",
+                            equalTo("Java Developer"))
+                    .body("find { it.companyName == 'TCS' }.status",
+                            equalTo("INTERVIEW"));
+
+        } finally {
+            repository.deleteById(savedFirst.getId());
+
+            if (savedSecond != null) {
+                repository.deleteById(savedSecond.getId());
+            }
+        }
     }
 }

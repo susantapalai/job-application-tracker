@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 @RestController
 public class JobApplicationController {
 
@@ -17,7 +19,6 @@ public class JobApplicationController {
 
     @GetMapping("/api/applications/{id}")
     public JobApplication getApplication(@PathVariable Long id) {
-
         JobApplication job = jobApplicationService.findById(id);
 
         if (job != null) {
@@ -34,5 +35,9 @@ public class JobApplicationController {
     @PostMapping("/api/applications")
     public JobApplication createApplication(@Valid @RequestBody JobApplication job) {
         return jobApplicationService.saveApplication(job);
+    }
+    @GetMapping("/api/applications")
+    public List<JobApplication> getAllApplications() {
+        return jobApplicationService.getAllApplications();
     }
 }
